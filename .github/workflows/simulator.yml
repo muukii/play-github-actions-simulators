@@ -1,0 +1,33 @@
+name: Install Simulators
+
+on: [push]
+
+jobs:
+  test-on-14:
+    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode: ["14.2"]
+        destination:
+          - "platform=iOS Simulator,OS=16.0,name=iPhone 14"
+          - 'platform=iOS Simulator,OS=15.4,name=iPhone 8'
+          - 'platform=iOS Simulator,OS=14.5,name=iPhone 8'
+          - 'platform=iOS Simulator,OS=13.7,name=iPhone 8'
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1.1
+        with:
+          xcode-version: ${{ matrix.xcode }}
+      - uses: actions/checkout@v2
+      - run: |
+          xcversion simulators --install='iOS 15.4'
+          xcversion simulators --install='iOS 14.5'
+          xcversion simulators --install='iOS 13.7'
+          xcversion simulators --install='iOS 16.0'
+      - run: xcrun simctl list runtimes
+      - name: Create Simulators
+        run: |
+          xcrun simctl create SIM com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-13-7;
+          xcrun simctl create SIM com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-14-5;
+          xcrun simctl create SIM com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-15-4;
+          xcrun simctl create SIM com.apple.CoreSimulator.SimDeviceType.iPhone-8 com.apple.CoreSimulator.SimRuntime.iOS-16-0;
